@@ -74,17 +74,20 @@ const zombiesController = {
     deleteZombies: (zombies) => __awaiter(void 0, void 0, void 0, function* () {
         return new Promise((resolve) => {
             const result = {
-                sucess: [],
+                success: [],
                 error: []
             };
+            if (!!!zombies.length) {
+                resolve(result);
+            }
             zombies.forEach((zombie, index) => {
-                db.remove({ _id: zombie._id || zombie }, {}, (err, zombie) => {
+                db.remove({ _id: zombie._id || zombie }, {}, (err, n) => {
                     if (err) {
                         result.error.push(zombie);
                         return;
                     }
-                    result.sucess.push(zombie);
-                    if (result.error.length + result.sucess.length === zombies.length) {
+                    result.success.push(zombie);
+                    if (result.error.length + result.success.length === zombies.length) {
                         resolve(result);
                     }
                 });

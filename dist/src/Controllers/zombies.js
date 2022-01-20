@@ -21,6 +21,7 @@ var _ZombiesController_db;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ItemError = void 0;
 const zombies_1 = __importDefault(require("../Database/zombies"));
+const items_1 = require("../Database/items");
 const axios_1 = __importDefault(require("axios"));
 const fast_xml_parser_1 = require("fast-xml-parser");
 const parser = new fast_xml_parser_1.XMLParser();
@@ -70,14 +71,23 @@ class ZombiesController {
         this.addItemToZombie = (id, itemName) => __awaiter(this, void 0, void 0, function* () {
             try {
                 const zombie = yield zombies_1.default.getZombieById(id);
-                const possibleItems = yield (yield axios_1.default.get('https://zombie-items-api.herokuapp.com/api/items')).data.items;
-                const item = possibleItems.find((item) => item.name === itemName);
+                const now = new Date();
+                let possibleItems = yield (0, items_1.getItemsList)();
+                if (possibleItems.updatedAt < now) {
+                    const updatedList = yield (yield axios_1.default.get('https://zombie-items-api.herokuapp.com/api/items')).data.items;
+                    yield (0, items_1.updateItemsList)(updatedList);
+                    possibleItems = updatedList;
+                }
+                const item = possibleItems.items.find((item) => item.name === itemName);
                 if (!item) {
                     throw new ItemError('Item not found');
                 }
+                else if (zombie.items.find((item) => item.name === itemName)) {
+                    throw new ItemError('Item already exists');
+                }
                 zombie.items = [...zombie.items, item];
                 yield zombies_1.default.updateZombie(zombie);
-                return item;
+                return zombie;
             }
             catch (err) {
                 throw err;
