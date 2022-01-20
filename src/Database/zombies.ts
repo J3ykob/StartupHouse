@@ -1,5 +1,6 @@
 import {getDatabase} from '../database';
 import {Zombie, Item} from '../../interfaces/zombies';
+import {ZombieError} from '../Controllers/zombies';
 
 const db = getDatabase();
 
@@ -14,7 +15,7 @@ const zombiesController = {
         return new Promise<Zombie[]>((resolve, reject)=>{
             db.find<Zombie>({}, (err:ZombieQueryError, zombies:Zombie[]) => {
                 if(err){
-                    reject(err);
+                    reject(new ZombieError("Something went wrong when performing findOne query", 500));
                     return;
                 }
                 resolve(zombies)
@@ -25,7 +26,7 @@ const zombiesController = {
         return new Promise<Zombie>((resolve, reject)=>{
             db.findOne<Zombie>({_id: id}, (err:ZombieQueryError, zombie:Zombie) => {
                 if(err){
-                    reject(err);
+                    reject(new ZombieError("Something went wrong when performing findOne query", 500));
                     return;
                 }
                 resolve(zombie)
@@ -36,7 +37,7 @@ const zombiesController = {
         return new Promise<number>((resolve, reject)=>{
             db.update({_id: zombie._id}, zombie, {}, (err:ZombieQueryError, zombie:number) => {
                 if(err){
-                    reject(err);
+                    reject(new ZombieError("Something went wrong when updating zombie database", 500));
                     return;
                 }
                 resolve(zombie)
@@ -55,7 +56,7 @@ const zombiesController = {
             })
             db.insert(zombies, (err:ZombieQueryError, zombies:Zombie[]) => {
                 if(err){
-                    reject(err);
+                    reject(new ZombieError("Something went wrong while creating zombies", 500));
                     return;
                 }
                 resolve(zombies);

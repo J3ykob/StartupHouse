@@ -37,11 +37,11 @@ describe("Zombies controller", () => {
 
     it("Should add and remove items from the zombie", async () => {
         try{
-            await zombieController.addItemToZombie('123', 'item1');
+            await zombieController.addItemToZombie('123', [678]);
         }catch(err){
             expect(err).toBeInstanceOf(Error);
         }
-        const zombie = await zombieController.addItemToZombie('123', 'item3');
+        const zombie = await zombieController.addItemToZombie('123', [123]);
         expect(zombie).toBeInstanceOf(Object);
     })
 

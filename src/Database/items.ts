@@ -4,9 +4,9 @@ import { Item } from '../../interfaces/zombies';
 
 const db = getDatabase();
 
-export const updateItemsList = async (updatedList: Item[]) => {
+export const updateItemsList = async (updatedList: {items: Item[], updatedAt: Date}) => {
     return new Promise<number>((resolve, reject) => {
-        db.update({_id: "itemsList"}, { $set: { items: updatedList, updatedAt: new Date() } }, {}, (err, n) => {
+        db.update({_id: "itemsList"}, {...updatedList, _id:"itemsList"}, {}, (err, n) => {
             if (err) {
                 reject(err)
                 return;

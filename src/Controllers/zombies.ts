@@ -8,6 +8,13 @@ import { XMLParser } from 'fast-xml-parser'
 const parser = new XMLParser();
 
 export class ItemError extends Error {}
+export class ZombieError extends Error {
+    status: number;
+    constructor(message: string, status: number) {
+        super(message);
+        this.status = status;
+    }
+}
 
 export default class ZombiesController {
     #db: Nedb;
@@ -41,8 +48,6 @@ export default class ZombiesController {
             const total = items.reduce((acc:number, item) => acc+item.price, 0);
             const currencies = await (await axios.get('http://api.nbp.pl/api/exchangerates/tables/C/today/', {headers: {'Accept': 'application/json'}})).data[0].rates;
 
-            // let jObj = parser.parse();
-
             return {
                 EUR: currencies.find((rate: { code: string })=>rate.code === "EUR").ask * total,
                 USD: currencies.find((rate: { code: string })=>rate.code === "USD").ask * total,
@@ -54,27 +59,29 @@ export default class ZombiesController {
         }        
     }
 
-    addItemToZombie = async (id: string, itemName: string) => {
+    addItemToZombie = async (id: string, itemsId: number[]) => {
         try{
             const zombie = await zombiesController.getZombieById(id);
             const now = new Date()
             
             let possibleItems = await getItemsList();
-            if(possibleItems.updatedAt < now){
+            if(new Date(possibleItems.updatedAt).getDate() < now.getDate()){
                 const updatedList = await (await axios.get('https://zombie-items-api.herokuapp.com/api/items')).data.items;
-                await updateItemsList(updatedList);
-                possibleItems = updatedList;
+                possibleItems = {items: updatedList, updatedAt: new Date()};
+                await updateItemsList(possibleItems);   
             }
             
-            const item: Item = possibleItems.items.find((item: { name: string })=>item.name === itemName);
+            let itemsToAdd: Item[] = possibleItems.items.filter((item: Item)=>itemsId.includes(item.id));
+            itemsToAdd = itemsToAdd.filter((item: Item)=>!zombie.items.includes(item));
 
-            if(!item){
-                throw new ItemError('Item not found');
-            }else if(zombie.items.find((item: { name: string })=>item.name === itemName)){
-                throw new ItemError('Item already exists');
+            if(!itemsToAdd[0]){
+                throw new ZombieError('No new items found', 401);
             }
 
-            zombie.items = [...zombie.items, item];
+            zombie.items = [...zombie.items, ...itemsToAdd];
+            if(zombie.items.length > 5){
+                zombie.items.splice(5)
+            }
             await zombiesController.updateZombie(zombie);
             return zombie;
 
@@ -83,16 +90,12 @@ export default class ZombiesController {
         }
     }
 
-    removeItemFromZombie = async (id: string, name: string) => {
+    removeItemsFromZombie = async (id: string, itemsId: number[]) => {
         try{
             const zombie = await zombiesController.getZombieById(id);
-            const item = zombie.items.find((item: Item) =>item.name === name);
-            if(!item){
-                throw new ItemError('Item not found');
-            }
-            zombie.items.splice(zombie.items.indexOf(item), 1);
+            zombie.items = zombie.items.filter((item: Item) =>!itemsId.includes(item.id));
             await zombiesController.updateZombie(zombie);
-            return item;
+            return zombie;
         }catch(err){
             throw err;
         }
@@ -139,7 +142,7 @@ export default class ZombiesController {
         })
     }
 
-    kill = async (zombies: Zombie[]) => {
+    kill = async (zombies: Zombie[] | string[]) => {
         try{
             const deadHorde = await zombiesController.deleteZombies(zombies);
             return deadHorde;
@@ -147,5 +150,4 @@ export default class ZombiesController {
             throw err;
         }
     }
-
 }
