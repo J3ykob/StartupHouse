@@ -7,7 +7,7 @@ export default class Database {
     #db: Nedb;
 
     constructor(options?: Nedb.DataStoreOptions){
-        this.#db = new Nedb({ filename: './database.db', autoload: true, ...options });
+        this.#db = new Nedb({ filename: './dist/database.db', autoload: true, ...options });
     }
     get db(){
         return this.#db;

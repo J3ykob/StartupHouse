@@ -21,7 +21,7 @@ let database = null;
 class Database {
     constructor(options) {
         _Database_db.set(this, void 0);
-        __classPrivateFieldSet(this, _Database_db, new nedb_1.default(Object.assign({ filename: './database.db', autoload: true }, options)), "f");
+        __classPrivateFieldSet(this, _Database_db, new nedb_1.default(Object.assign({ filename: './dist/database.db', autoload: true }, options)), "f");
     }
     get db() {
         return __classPrivateFieldGet(this, _Database_db, "f");
