@@ -39,12 +39,12 @@ describe("Zombies controller", () => {
     }));
     it("Should add and remove items from the zombie", () => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            yield zombieController.addItemToZombie('123', 'item1');
+            yield zombieController.addItemToZombie('123', [678]);
         }
         catch (err) {
             expect(err).toBeInstanceOf(Error);
         }
-        const zombie = yield zombieController.addItemToZombie('123', 'item3');
+        const zombie = yield zombieController.addItemToZombie('123', [123]);
         expect(zombie).toBeInstanceOf(Object);
     }));
     it("Should show a list of zombies", () => __awaiter(void 0, void 0, void 0, function* () {

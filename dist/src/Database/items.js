@@ -14,7 +14,7 @@ const database_1 = require("../database");
 const db = (0, database_1.getDatabase)();
 const updateItemsList = (updatedList) => __awaiter(void 0, void 0, void 0, function* () {
     return new Promise((resolve, reject) => {
-        db.update({ _id: "itemsList" }, { $set: { items: updatedList, updatedAt: new Date() } }, {}, (err, n) => {
+        db.update({ _id: "itemsList" }, Object.assign(Object.assign({}, updatedList), { _id: "itemsList" }), {}, (err, n) => {
             if (err) {
                 reject(err);
                 return;

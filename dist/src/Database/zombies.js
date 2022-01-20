@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ZombieQueryError = void 0;
 const database_1 = require("../database");
+const zombies_1 = require("../Controllers/zombies");
 const db = (0, database_1.getDatabase)();
 class ZombieQueryError extends Error {
 }
@@ -23,7 +24,7 @@ const zombiesController = {
         return new Promise((resolve, reject) => {
             db.find({}, (err, zombies) => {
                 if (err) {
-                    reject(err);
+                    reject(new zombies_1.ZombieError("Something went wrong when performing findOne query", 500));
                     return;
                 }
                 resolve(zombies);
@@ -34,7 +35,7 @@ const zombiesController = {
         return new Promise((resolve, reject) => {
             db.findOne({ _id: id }, (err, zombie) => {
                 if (err) {
-                    reject(err);
+                    reject(new zombies_1.ZombieError("Something went wrong when performing findOne query", 500));
                     return;
                 }
                 resolve(zombie);
@@ -45,7 +46,7 @@ const zombiesController = {
         return new Promise((resolve, reject) => {
             db.update({ _id: zombie._id }, zombie, {}, (err, zombie) => {
                 if (err) {
-                    reject(err);
+                    reject(new zombies_1.ZombieError("Something went wrong when updating zombie database", 500));
                     return;
                 }
                 resolve(zombie);
@@ -64,7 +65,7 @@ const zombiesController = {
             });
             db.insert(zombies, (err, zombies) => {
                 if (err) {
-                    reject(err);
+                    reject(new zombies_1.ZombieError("Something went wrong while creating zombies", 500));
                     return;
                 }
                 resolve(zombies);

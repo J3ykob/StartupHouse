@@ -99,20 +99,22 @@ router.get('/:id/value', (req, res, next) => {
         next(err);
     }
 });
-router.post('/:id/:item', (req, res, next) => {
+router.post('/:id', (req, res, next) => {
     try {
-        const { id, item } = req.params;
-        const zombieItem = zombiesController.addItemToZombie(id, item);
+        const { itemsId } = req.body;
+        const { id } = req.params;
+        const zombieItem = zombiesController.addItemToZombie(id, itemsId);
         res.json(zombieItem);
     }
     catch (err) {
         next(err);
     }
 });
-router.delete('/:id/:item', (req, res, next) => {
+router.delete('/:id', (req, res, next) => {
     try {
-        const { id, item } = req.params;
-        const zombieItem = zombiesController.removeItemFromZombie(id, item);
+        const { itemsId } = req.body;
+        const { id } = req.params;
+        const zombieItem = zombiesController.removeItemsFromZombie(id, itemsId);
         res.json(zombieItem);
     }
     catch (err) {
@@ -120,8 +122,8 @@ router.delete('/:id/:item', (req, res, next) => {
     }
 });
 router.use((err, _, res, next) => {
-    if (err instanceof zombies_1.ItemError) {
-        res.status(401).json({ error: err.message });
+    if (err instanceof zombies_1.ZombieError) {
+        res.status(err.status).json({ error: err.message });
     }
     else {
         next(err);

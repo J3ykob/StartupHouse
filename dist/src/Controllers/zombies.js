@@ -19,7 +19,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 var _ZombiesController_db;
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ItemError = void 0;
+exports.ZombieError = exports.ItemError = void 0;
 const zombies_1 = __importDefault(require("../Database/zombies"));
 const items_1 = require("../Database/items");
 const axios_1 = __importDefault(require("axios"));
@@ -28,6 +28,13 @@ const parser = new fast_xml_parser_1.XMLParser();
 class ItemError extends Error {
 }
 exports.ItemError = ItemError;
+class ZombieError extends Error {
+    constructor(message, status) {
+        super(message);
+        this.status = status;
+    }
+}
+exports.ZombieError = ZombieError;
 class ZombiesController {
     constructor(db) {
         _ZombiesController_db.set(this, void 0);
@@ -57,7 +64,6 @@ class ZombiesController {
                 const items = yield this.getItems(id);
                 const total = items.reduce((acc, item) => acc + item.price, 0);
                 const currencies = yield (yield axios_1.default.get('http://api.nbp.pl/api/exchangerates/tables/C/today/', { headers: { 'Accept': 'application/json' } })).data[0].rates;
-                // let jObj = parser.parse();
                 return {
                     EUR: currencies.find((rate) => rate.code === "EUR").ask * total,
                     USD: currencies.find((rate) => rate.code === "USD").ask * total,
@@ -68,24 +74,25 @@ class ZombiesController {
                 throw err;
             }
         });
-        this.addItemToZombie = (id, itemName) => __awaiter(this, void 0, void 0, function* () {
+        this.addItemToZombie = (id, itemsId) => __awaiter(this, void 0, void 0, function* () {
             try {
                 const zombie = yield zombies_1.default.getZombieById(id);
                 const now = new Date();
                 let possibleItems = yield (0, items_1.getItemsList)();
-                if (possibleItems.updatedAt < now) {
+                if (new Date(possibleItems.updatedAt).getDate() < now.getDate()) {
                     const updatedList = yield (yield axios_1.default.get('https://zombie-items-api.herokuapp.com/api/items')).data.items;
-                    yield (0, items_1.updateItemsList)(updatedList);
-                    possibleItems = updatedList;
+                    possibleItems = { items: updatedList, updatedAt: new Date() };
+                    yield (0, items_1.updateItemsList)(possibleItems);
                 }
-                const item = possibleItems.items.find((item) => item.name === itemName);
-                if (!item) {
-                    throw new ItemError('Item not found');
+                let itemsToAdd = possibleItems.items.filter((item) => itemsId.includes(item.id));
+                itemsToAdd = itemsToAdd.filter((item) => !zombie.items.includes(item));
+                if (!itemsToAdd[0]) {
+                    throw new ZombieError('No new items found', 401);
                 }
-                else if (zombie.items.find((item) => item.name === itemName)) {
-                    throw new ItemError('Item already exists');
+                zombie.items = [...zombie.items, ...itemsToAdd];
+                if (zombie.items.length > 5) {
+                    zombie.items.splice(5);
                 }
-                zombie.items = [...zombie.items, item];
                 yield zombies_1.default.updateZombie(zombie);
                 return zombie;
             }
@@ -93,16 +100,12 @@ class ZombiesController {
                 throw err;
             }
         });
-        this.removeItemFromZombie = (id, name) => __awaiter(this, void 0, void 0, function* () {
+        this.removeItemsFromZombie = (id, itemsId) => __awaiter(this, void 0, void 0, function* () {
             try {
                 const zombie = yield zombies_1.default.getZombieById(id);
-                const item = zombie.items.find((item) => item.name === name);
-                if (!item) {
-                    throw new ItemError('Item not found');
-                }
-                zombie.items.splice(zombie.items.indexOf(item), 1);
+                zombie.items = zombie.items.filter((item) => !itemsId.includes(item.id));
                 yield zombies_1.default.updateZombie(zombie);
-                return item;
+                return zombie;
             }
             catch (err) {
                 throw err;
