@@ -1,0 +1,19 @@
+{
+  "name": "startuphouse",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./src/server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./src/server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.2",
+    "nedb": "^1.8.0"
+  },
+  "devDependencies": {
+    "jest": "^27.4.7"
+  }
+}
