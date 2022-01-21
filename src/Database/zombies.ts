@@ -44,17 +44,21 @@ const zombiesController = {
             })
         });
     },
-    createZombies: (cfg: [{name: string, items?: Item[], createdAt?: Date}] | Zombie[]) => {
-        return new Promise<Zombie[]>((resolve, reject)=>{
-            const zombies: Zombie[] = []
+    createZombies: (cfg: [{name: string, items?: Item[], createdAt?: Date}] | string[]) => {
+        return new Promise<Zombie[]>(async (resolve, reject)=>{
+            const zombiesToAdd: Zombie[] = []
+            const zombies = await zombiesController.getZombies();
             cfg.forEach(zombie=>{
-                zombies.push({
-                    name: zombie.name,
-                    createdAt: zombie.createdAt || new Date(),
-                    items: zombie.items || []
-                })
+                const name = (typeof zombie == "string") ? zombie : zombie.name
+                if(!zombies.some(z=>z.name === name)){
+                    zombiesToAdd.push({
+                        name: name,
+                        createdAt: zombie.createdAt || new Date(),
+                        items: zombie.items || []
+                    })
+                }
             })
-            db.insert(zombies, (err:ZombieQueryError, zombies:Zombie[]) => {
+            db.insert(zombiesToAdd, (err:ZombieQueryError, zombies:Zombie[]) => {
                 if(err){
                     reject(new ZombieError("Something went wrong while creating zombies", 500));
                     return;

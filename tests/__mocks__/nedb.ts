@@ -27,12 +27,12 @@ const zombies = [{
     items: [{
         name: 'item1',
         price: 10,
-        id: 123
+        id: 1234
     },
     {
         name: 'item3',
         price: 20,
-        id: 456
+        id: 4567
     }],
     updatedAt: '2019-01-01T00:00:00.000Z'
 }];

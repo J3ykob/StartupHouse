@@ -23,10 +23,6 @@ describe("Zombies controller", () => {
         expect(zombies[0]).toHaveProperty('name', 'Zombie1');
         expect(zombies[0]).toHaveProperty('createdAt');
     }));
-    // I want to display items that this zombie has;
-    // I want to see total value of zombie’s items in 3 currencies, PLN/EU/USD;
-    // I want to add and remove items from the zombie;
-    // I want to see a list of zombies (create/update/remove them also);
     it("Should display items that this zombie has", () => __awaiter(void 0, void 0, void 0, function* () {
         const items = yield zombieController.getItems('123');
         expect(items[0]).toHaveProperty('name', 'item1');
@@ -39,12 +35,12 @@ describe("Zombies controller", () => {
     }));
     it("Should add and remove items from the zombie", () => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            yield zombieController.addItemToZombie('123', [678]);
+            yield zombieController.addItemToZombie('123', [5123]);
         }
         catch (err) {
             expect(err).toBeInstanceOf(Error);
         }
-        const zombie = yield zombieController.addItemToZombie('123', [123]);
+        const zombie = yield zombieController.addItemToZombie('123', [4567]);
         expect(zombie).toBeInstanceOf(Object);
     }));
     it("Should show a list of zombies", () => __awaiter(void 0, void 0, void 0, function* () {
@@ -53,8 +49,8 @@ describe("Zombies controller", () => {
         expect(zombies[0]).toHaveProperty('createdAt');
     }));
     it("Should create zombies", () => __awaiter(void 0, void 0, void 0, function* () {
-        const zombie = yield zombieController.riseFromDeath([{ name: 'Zombie2' }]);
-        expect(zombie[0]).toHaveProperty('name', 'Zombie2');
+        const zombie = yield zombieController.riseFromDeath([{ name: 'Zombaie2' }]);
+        expect(zombie[0]).toHaveProperty('name', 'Zombaie2');
         expect(zombie[0]).toHaveProperty('createdAt');
     }));
     it("Should remove zombies", () => __awaiter(void 0, void 0, void 0, function* () {

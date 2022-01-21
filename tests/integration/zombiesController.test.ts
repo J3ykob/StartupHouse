@@ -1,7 +1,5 @@
 import { initDatabase, getDatabase } from "../../src/database";
-import Nedb from 'nedb'
 import {Zombie} from '../../interfaces/zombies';
-import axios from 'axios'
 
 import ZombiesController from '../../src/Controllers/zombies';
 
@@ -18,11 +16,6 @@ describe("Zombies controller", () => {
         expect(zombies[0]).toHaveProperty('createdAt');
     })
 
-// I want to display items that this zombie has;
-// I want to see total value of zombie’s items in 3 currencies, PLN/EU/USD;
-// I want to add and remove items from the zombie;
-// I want to see a list of zombies (create/update/remove them also);
-
     it("Should display items that this zombie has", async () => {
         const items = await zombieController.getItems('123');
         expect(items[0]).toHaveProperty('name', 'item1');
@@ -37,11 +30,11 @@ describe("Zombies controller", () => {
 
     it("Should add and remove items from the zombie", async () => {
         try{
-            await zombieController.addItemToZombie('123', [678]);
+            await zombieController.addItemToZombie('123', [5123]);
         }catch(err){
             expect(err).toBeInstanceOf(Error);
         }
-        const zombie = await zombieController.addItemToZombie('123', [123]);
+        const zombie = await zombieController.addItemToZombie('123', [4567]);
         expect(zombie).toBeInstanceOf(Object);
     })
 
@@ -52,8 +45,8 @@ describe("Zombies controller", () => {
     })
 
     it("Should create zombies", async () => {
-        const zombie = await zombieController.riseFromDeath([{name: 'Zombie2'}]);
-        expect(zombie[0]).toHaveProperty('name', 'Zombie2');
+        const zombie = await zombieController.riseFromDeath([{name: 'Zombaie2'}]);
+        expect(zombie[0]).toHaveProperty('name', 'Zombaie2');
         expect(zombie[0]).toHaveProperty('createdAt');
     })
     it("Should remove zombies", async () => {

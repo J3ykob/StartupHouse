@@ -19,15 +19,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 var _ZombiesController_db;
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ZombieError = exports.ItemError = void 0;
+exports.ZombieError = void 0;
 const zombies_1 = __importDefault(require("../Database/zombies"));
 const items_1 = require("../Database/items");
 const axios_1 = __importDefault(require("axios"));
-const fast_xml_parser_1 = require("fast-xml-parser");
-const parser = new fast_xml_parser_1.XMLParser();
-class ItemError extends Error {
-}
-exports.ItemError = ItemError;
 class ZombieError extends Error {
     constructor(message, status) {
         super(message);
@@ -79,13 +74,13 @@ class ZombiesController {
                 const zombie = yield zombies_1.default.getZombieById(id);
                 const now = new Date();
                 let possibleItems = yield (0, items_1.getItemsList)();
-                if (new Date(possibleItems.updatedAt).getDate() < now.getDate()) {
+                if (!possibleItems || new Date(possibleItems.updatedAt).getDate() < now.getDate()) {
                     const updatedList = yield (yield axios_1.default.get('https://zombie-items-api.herokuapp.com/api/items')).data.items;
                     possibleItems = { items: updatedList, updatedAt: new Date() };
                     yield (0, items_1.updateItemsList)(possibleItems);
                 }
                 let itemsToAdd = possibleItems.items.filter((item) => itemsId.includes(item.id));
-                itemsToAdd = itemsToAdd.filter((item) => !zombie.items.includes(item));
+                itemsToAdd = itemsToAdd.filter((item) => !zombie.items.find((zombieItem) => zombieItem.id === item.id));
                 if (!itemsToAdd[0]) {
                     throw new ZombieError('No new items found', 401);
                 }

@@ -54,23 +54,27 @@ const zombiesController = {
         });
     },
     createZombies: (cfg) => {
-        return new Promise((resolve, reject) => {
-            const zombies = [];
+        return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
+            const zombiesToAdd = [];
+            const zombies = yield zombiesController.getZombies();
             cfg.forEach(zombie => {
-                zombies.push({
-                    name: zombie.name,
-                    createdAt: zombie.createdAt || new Date(),
-                    items: zombie.items || []
-                });
+                const name = (typeof zombie == "string") ? zombie : zombie.name;
+                if (!zombies.some(z => z.name === name)) {
+                    zombiesToAdd.push({
+                        name: name,
+                        createdAt: zombie.createdAt || new Date(),
+                        items: zombie.items || []
+                    });
+                }
             });
-            db.insert(zombies, (err, zombies) => {
+            db.insert(zombiesToAdd, (err, zombies) => {
                 if (err) {
                     reject(new zombies_1.ZombieError("Something went wrong while creating zombies", 500));
                     return;
                 }
                 resolve(zombies);
             });
-        });
+        }));
     },
     deleteZombies: (zombies) => __awaiter(void 0, void 0, void 0, function* () {
         return new Promise((resolve) => {

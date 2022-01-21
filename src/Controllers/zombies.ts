@@ -1,13 +1,9 @@
-import Nedb, {Cursor} from 'nedb'
+import Nedb from 'nedb'
 import {Zombie, Item} from '../../interfaces/zombies'
 import zombiesController from '../Database/zombies'
 import { updateItemsList, getItemsList } from '../Database/items'
 import axios from 'axios'
-import { XMLParser } from 'fast-xml-parser'
 
-const parser = new XMLParser();
-
-export class ItemError extends Error {}
 export class ZombieError extends Error {
     status: number;
     constructor(message: string, status: number) {
@@ -65,14 +61,14 @@ export default class ZombiesController {
             const now = new Date()
             
             let possibleItems = await getItemsList();
-            if(new Date(possibleItems.updatedAt).getDate() < now.getDate()){
+            if(!possibleItems || new Date(possibleItems.updatedAt).getDate() < now.getDate()){
                 const updatedList = await (await axios.get('https://zombie-items-api.herokuapp.com/api/items')).data.items;
                 possibleItems = {items: updatedList, updatedAt: new Date()};
                 await updateItemsList(possibleItems);   
             }
             
             let itemsToAdd: Item[] = possibleItems.items.filter((item: Item)=>itemsId.includes(item.id));
-            itemsToAdd = itemsToAdd.filter((item: Item)=>!zombie.items.includes(item));
+            itemsToAdd = itemsToAdd.filter((item: Item)=>!zombie.items.find((zombieItem: Item)=>zombieItem.id === item.id));
 
             if(!itemsToAdd[0]){
                 throw new ZombieError('No new items found', 401);

@@ -14,7 +14,7 @@ exports.default = {
                         {
                             name: 'item2',
                             price: 20,
-                            id: 456
+                            id: 4567
                         }
                     ]
                 }

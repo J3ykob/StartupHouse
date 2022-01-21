@@ -48,6 +48,7 @@ router.route('/')
         const { zombies } = req.body;
         if (!zombies) {
             res.status(401).json({ error: 'No zombies to create' });
+            return;
         }
         const risedZombies = yield zombiesController.riseFromDeath(zombies);
         res.json(risedZombies);
@@ -61,6 +62,7 @@ router.route('/')
         const { zombies } = req.body;
         if (!zombies) {
             res.status(401).json({ error: 'No zombies to delete' });
+            return;
         }
         const killedZombies = yield zombiesController.kill(zombies);
         res.json(killedZombies);
@@ -69,58 +71,58 @@ router.route('/')
         next(err);
     }
 }));
-router.get('/:id', (req, res, next) => {
+router.get('/:id', (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
-        const zombie = zombiesController.getById(id);
+        const zombie = yield zombiesController.getById(id);
         res.json(zombie);
     }
     catch (err) {
         next(err);
     }
-});
-router.get('/:id/items', (req, res, next) => {
+}));
+router.get('/:id/items', (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
-        const zombieItems = zombiesController.getItems(id);
+        const zombieItems = yield zombiesController.getItems(id);
         res.json(zombieItems);
     }
     catch (err) {
         next(err);
     }
-});
-router.get('/:id/value', (req, res, next) => {
+}));
+router.get('/:id/value', (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
-        const zombieValue = zombiesController.getItemsValue(id);
+        const zombieValue = yield zombiesController.getItemsValue(id);
         res.json(zombieValue);
     }
     catch (err) {
         next(err);
     }
-});
-router.post('/:id', (req, res, next) => {
+}));
+router.post('/:id', (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { itemsId } = req.body;
         const { id } = req.params;
-        const zombieItem = zombiesController.addItemToZombie(id, itemsId);
+        const zombieItem = yield zombiesController.addItemToZombie(id, itemsId);
         res.json(zombieItem);
     }
     catch (err) {
         next(err);
     }
-});
-router.delete('/:id', (req, res, next) => {
+}));
+router.delete('/:id', (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { itemsId } = req.body;
         const { id } = req.params;
-        const zombieItem = zombiesController.removeItemsFromZombie(id, itemsId);
+        const zombieItem = yield zombiesController.removeItemsFromZombie(id, itemsId);
         res.json(zombieItem);
     }
     catch (err) {
         next(err);
     }
-});
+}));
 router.use((err, _, res, next) => {
     if (err instanceof zombies_1.ZombieError) {
         res.status(err.status).json({ error: err.message });
