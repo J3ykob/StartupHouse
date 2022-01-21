@@ -60,8 +60,8 @@ class ZombiesController {
                 const total = items.reduce((acc, item) => acc + item.price, 0);
                 const currencies = yield (yield axios_1.default.get('http://api.nbp.pl/api/exchangerates/tables/C/today/', { headers: { 'Accept': 'application/json' } })).data[0].rates;
                 return {
-                    EUR: currencies.find((rate) => rate.code === "EUR").ask * total,
-                    USD: currencies.find((rate) => rate.code === "USD").ask * total,
+                    EUR: total / currencies.find((rate) => rate.code === "EUR").ask,
+                    USD: total / currencies.find((rate) => rate.code === "USD").ask,
                     PLN: total
                 };
             }
