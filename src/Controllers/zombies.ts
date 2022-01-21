@@ -45,8 +45,8 @@ export default class ZombiesController {
             const currencies = await (await axios.get('http://api.nbp.pl/api/exchangerates/tables/C/today/', {headers: {'Accept': 'application/json'}})).data[0].rates;
 
             return {
-                EUR: currencies.find((rate: { code: string })=>rate.code === "EUR").ask * total,
-                USD: currencies.find((rate: { code: string })=>rate.code === "USD").ask * total,
+                EUR: total / currencies.find((rate: { code: string })=>rate.code === "EUR").ask,
+                USD: total / currencies.find((rate: { code: string })=>rate.code === "USD").ask,
                 PLN: total
             }
 
