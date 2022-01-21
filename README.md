@@ -1,7 +1,26 @@
 # ZOMBIE API Documentation
 API used to interact with alternative apocalyptic world 😬
 
-## Zombie endpoint 
+### Run the API locally
+
+`npm install`
+
+`npm start` to start the app
+
+`npm test` to run the tests
+
+
+---
+
+`docker-compose up -d` to run the docker container
+
+`docker-compose down` to stop the container
+
+**The API runs on port 3000 by default**
+
+
+
+# Zombie endpoint 
 
 ### `GET /zombies`
 Used to get the list of all zombies from database
@@ -42,7 +61,7 @@ Used to add new zombies to the database (list of zombies accepted).
 body: {
 	zombies: [{
 		name: "Zombie1",
-		createdAt: "2002-10-31T01:30:00.000-05:00", //optional
+		createdAt: "2002-10-31T01:30:00.000-05:00", 					//optional
 		items: [									//optional
 			name: "item1",
 			id: 1,
@@ -50,6 +69,13 @@ body: {
 		}]
 	]
 }
+
+or
+
+body: {
+	zombies: ["Zombie1", "Zombie2", "Zombie3"]
+}
+
 ```
 #### Example response
 ```
@@ -80,6 +106,12 @@ body: {
 			price: 20
 		]
 	}]
+}
+
+or
+
+body: {
+	zombies: ["123", "456", "789"]							//Specify only zombie IDs
 }
 ```
 #### Example response
@@ -154,13 +186,16 @@ params: {
 }
 ```
 
-### `POST /zombies/:zombieId/:itemName`
+### `POST /zombies/:zombieId/`
 Used to add new item to the zombie's equipment. **Zombie can hold maximum of 5 items at once**
 #### Request schema
 ```
 params: {
 	zombieId: "123",
-	itemName: "item2"
+}
+
+body: {
+	itemsId: [1,2]
 }
 ```
 #### Example response
@@ -169,7 +204,7 @@ params: {
 		name: "Zombie1",
 		createdAt: "2002-10-31T01:30:00.000-05:00",
 		items: [{									
-			name: "item1",
+			name: "item1",					//newly added item
 			id: 1,
 			price: 20
 		},{
@@ -187,7 +222,10 @@ Used to delete item from zombie's equipment.
 ```
 params: {
 	zombieId: "123",
-	itemName: "item1"
+}
+
+body: {
+	itemsId: [2]
 }
 ```
 #### Example response
