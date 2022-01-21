@@ -1,4 +1,7 @@
 # ZOMBIE API Documentation
+
+[![Zombie API](https://github.com/J3ykob/StartupHouse/actions/workflows/node.js.yml/badge.svg)](https://github.com/J3ykob/StartupHouse/actions/workflows/node.js.yml)
+
 API used to interact with alternative apocalyptic world 😬
 
 ### Run the API locally
